@@ -101,7 +101,7 @@ Pages are categorized into two types **Internal Pages** and **Leaf Pages**, Both
   - `writePage(page)` → Flush page to disk.
 ---
 
-## 📌 Key Features
+## Key Features
 - Efficient indexing with B+ Tree
 - Dynamic page splitting/merging
 - In-memory buffer management
