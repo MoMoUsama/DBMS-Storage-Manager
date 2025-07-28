@@ -22,17 +22,17 @@ This project implements a **Storage Manager** for a **Database Management System
 
 ### 2. Page Layout
 
-Pages are categorized into two types:
+Pages are categorized into two types **Internal Pages** and **Leaf Pages**, Both page types contain headers with metadata such as page type, current size, next/prev pointers (for leaves), etc.:
 - **Internal Pages**:
   - Store ordered keys and child page pointers.
-  - Layout:
+  - structure:
     ```
     ┌────────────┬──────────────┬───────────────┐
     │ Page Header│   Keys[]     │ PageIDs[]     │
     └────────────┴──────────────┴───────────────┘
     ```
 
-### Internal Page Layout
+#### 2.1 Internal Page Layout
 
 | Offset | Size (bytes) | Field                                      |
 |--------|--------------|--------------------------------------------|
@@ -42,27 +42,18 @@ Pages are categorized into two types:
 | 12     | 4            | `maxSize` (maximum number of entries)      |
 | 16     | N            | Alternating pattern:<br>`childID_0, key_0, childID_1, ..., key_n` |
 
----
 
-## 🔹 Leaf Pages
-
-- **Purpose:** Store ordered keys and associated **record identifiers (RIDs)**.
-- **Structure:**
-
-
-
-- **Leaf Pages**:
-  - Store ordered keys and associated record identifiers (RIDs).
-  - Layout:
+**Leaf Pages**
+- Store ordered keys and associated **record identifiers (RIDs)**.
+- Structure:
     ```
     ┌────────────┬──────────────┬───────────────┐
     │ Page Header│   Keys[]     │ RIDs[]        │
     └────────────┴──────────────┴───────────────┘
     ```
-    > Both page types contain headers with metadata such as page type, current size, next/prev pointers (for leaves), etc.
   
 
-### Leaf Page Layout
+#### 2.2 Leaf Page Layout
 
 | Offset | Size (bytes) | Field                                     |
 |--------|--------------|-------------------------------------------|
@@ -73,9 +64,8 @@ Pages are categorized into two types:
 | 16     | 4            | `maxSize` (maximum number of pairs)       |
 | 20     | N            | Actual `key-value` pairs                  |
 
----
 
-## 📌 Notes
+**Notes**
 
 - All fields **before the key area** are part of the **page header (metadata)**.
 - Internal pages follow a **child-key-child** pattern.
@@ -109,36 +99,20 @@ Pages are categorized into two types:
 - Supports:
   - `readPage(pageId)` → Load page into buffer.
   - `writePage(page)` → Flush page to disk.
-
----
-
-## 🧵 Concurrency Control
-- Concurrent access to B+ Tree operations and buffer pool is protected using:
-  - **Latch Coupling (Crabbing)** for tree traversal
-  - **Synchronized blocks or locks** for disk and buffer access
-
 ---
 
 ## 📌 Key Features
-- ✅ Efficient indexing with B+ Tree
-- ✅ Dynamic page splitting/merging
-- ✅ In-memory buffer management
-- ✅ Background disk I/O scheduler
-- ✅ Concurrent-safe operations
+- Efficient indexing with B+ Tree
+- Dynamic page splitting/merging
+- In-memory buffer management
+- Background disk I/O scheduler
+- Concurrent-safe operations
 
 ---
 
-## 🧪 Future Work / Extensions
-- Implement **Recovery and Logging**
-- Add **Query Interface** and SQL-like commands
-- Extend to support **table schemas** and **multiple indexes**
-- Integrate with a **Query Execution Engine**
-
----
-
-## 🧑‍💻 Example Use Case
+## Example Use Case
 This system can be used as a **backend storage engine** for educational or lightweight database systems, especially those requiring **indexing and buffering strategies** close to real DBMS internals like PostgreSQL or SQLite.
 
 ---
 
-## 📂 Folder Structure (Example)
+## Folder Structure (Example)
