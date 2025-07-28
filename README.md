@@ -1,10 +1,10 @@
-# 📦 Storage Manager for a Database Management System (DBMS)
+# Storage Manager for a Database Management System (DBMS)
 
 This project implements a **Storage Manager** for a **Database Management System**, handling page-based disk operations, page buffering, and indexing using a **B+ Tree** data structure. The system is designed for **performance and modularity**, with support for **multithreaded disk scheduling** and efficient **buffer pool management**.
 
 ---
 
-## 🔧 Project Components
+## Project Components
 
 ### 1. B+ Tree Indexing
 - Implements a **B+ Tree** for efficient storage and retrieval of key-value pairs.
@@ -31,6 +31,14 @@ Pages are categorized into two types:
     │ Page Header│   Keys[]     │ PageIDs[]     │
     └────────────┴──────────────┴───────────────┘
     ```
+    Internal Page Layout
+Offset	Size (bytes)	Field
+0	4	pageType (e.g., 2 for internal)
+4	4	pageID
+8	4	size (number of child pointers - 1)
+12	4	maxSize
+16	N	Alternating child pointers and keys
+
 - **Leaf Pages**:
   - Store ordered keys and associated record identifiers (RIDs).
   - Layout:
@@ -39,8 +47,17 @@ Pages are categorized into two types:
     │ Page Header│   Keys[]     │ RIDs[]        │
     └────────────┴──────────────┴───────────────┘
     ```
+    > Both page types contain headers with metadata such as page type, current size, next/prev pointers (for leaves), etc.
+  
+ Leaf Page Layout
+Offset	Size (bytes)	Field
+0	4	pageType (e.g., 1 for leaf)
+4	4	pageID
+8	4	nextPageID
+12	4	size (number of key-value pairs)
+16	4	maxSize (maximum number of pairs)
+20	N	Actual key-value pairs
 
-> Both page types contain headers with metadata such as page type, current size, next/prev pointers (for leaves), etc.
 
 ---
 
