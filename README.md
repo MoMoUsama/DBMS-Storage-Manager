@@ -31,13 +31,25 @@ Pages are categorized into two types:
     │ Page Header│   Keys[]     │ PageIDs[]     │
     └────────────┴──────────────┴───────────────┘
     ```
-    Internal Page Layout
-Offset	Size (bytes)	Field
-0	4	pageType (e.g., 2 for internal)
-4	4	pageID
-8	4	size (number of child pointers - 1)
-12	4	maxSize
-16	N	Alternating child pointers and keys
+
+### Internal Page Layout
+
+| Offset | Size (bytes) | Field                                      |
+|--------|--------------|--------------------------------------------|
+| 0      | 4            | `pageType` (e.g., 2 for internal)          |
+| 4      | 4            | `pageID`                                   |
+| 8      | 4            | `size` (number of child pointers - 1)      |
+| 12     | 4            | `maxSize` (maximum number of entries)      |
+| 16     | N            | Alternating pattern:<br>`childID_0, key_0, childID_1, ..., key_n` |
+
+---
+
+## 🔹 Leaf Pages
+
+- **Purpose:** Store ordered keys and associated **record identifiers (RIDs)**.
+- **Structure:**
+
+
 
 - **Leaf Pages**:
   - Store ordered keys and associated record identifiers (RIDs).
@@ -49,14 +61,26 @@ Offset	Size (bytes)	Field
     ```
     > Both page types contain headers with metadata such as page type, current size, next/prev pointers (for leaves), etc.
   
- Leaf Page Layout
-Offset	Size (bytes)	Field
-0	4	pageType (e.g., 1 for leaf)
-4	4	pageID
-8	4	nextPageID
-12	4	size (number of key-value pairs)
-16	4	maxSize (maximum number of pairs)
-20	N	Actual key-value pairs
+
+### Leaf Page Layout
+
+| Offset | Size (bytes) | Field                                     |
+|--------|--------------|-------------------------------------------|
+| 0      | 4            | `pageType` (e.g., 1 for leaf)             |
+| 4      | 4            | `pageID`                                  |
+| 8      | 4            | `nextPageID`                              |
+| 12     | 4            | `size` (number of key-value pairs)        |
+| 16     | 4            | `maxSize` (maximum number of pairs)       |
+| 20     | N            | Actual `key-value` pairs                  |
+
+---
+
+## 📌 Notes
+
+- All fields **before the key area** are part of the **page header (metadata)**.
+- Internal pages follow a **child-key-child** pattern.
+- Leaf pages use **sequential key-RID** pairs.
+- This structured layout ensures compatibility with fixed-size pages and efficient memory/disk operations.
 
 
 ---
