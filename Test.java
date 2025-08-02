@@ -51,31 +51,31 @@ public class Test<Key extends Comparable<Key>, RID> {
         BPlusTree<Integer, Integer> tree = new BPlusTree<>(4, bpm); // small page size to force splits
         List<Integer> keys = List.of(10, 20, 30, 40, 50, 60, 70, 80, 90, 100);
         insert(keys, tree);
-        System.out.println("✅ Start testDeletionScenarios");
+        System.out.println("\n ✅ Start testDeletionScenarios");
 
         // Step 2: Simple delete (no underflow)
-        System.out.println("🧪 Delete 100 (simple case)");
+        System.out.println("[testDeletionScenarios]  Delete 100 (simple case)");
         tree.remove(100);
         tree.printTree();
 
         // Step 3: Delete to trigger redistribution (borrow from sibling)
-        System.out.println("🧪 Delete 90 (causes redistribution)");
+        System.out.println("[testDeletionScenarios]Delete 90 (simple case)");
         tree.remove(90);
         tree.printTree();
 
         // Step 4: Delete to trigger merging (merge two leaf pages)
-        System.out.println("🧪 Delete 80 (causes merge)");
+        System.out.println("[testDeletionScenarios] Delete 80 (Leaf Underflow, do merging)");
         tree.remove(80);
         tree.printTree();
 
         // Step 5: Delete to cause internal page underflow
-        System.out.println("🧪 Delete 70 (internal underflow)");
+        System.out.println("[testDeletionScenarios] Delete 70 (simple case)");
         tree.remove(70);
         tree.printTree();
 
         // Step 6: Delete all remaining keys to shrink root
         for (int key : List.of(10, 20, 30, 40, 50, 60)) {
-            System.out.println("🧪 Delete " + key);
+            System.out.println("[testDeletionScenarios] Delete " + key);
             tree.remove(key);
             tree.printTree();
         }
@@ -98,13 +98,20 @@ public class Test<Key extends Comparable<Key>, RID> {
     }
 
     public void testMergeAfterDeletions() {
-        BufferPoolManager bpm = new BufferPoolManager(100, 3); // size 100 pool
+        BufferPoolManager bpm = new BufferPoolManager(3, 3); // size 100 pool
         BPlusTree<Integer, Integer> tree = new BPlusTree<>(4, bpm); // small page size to force splits
-        for (int i = 1; i <= 10; i++) {
-            tree.insert(i, 100 + i);
-        }
+        // Insert keys
+        List<Integer> insertedKeys = List.of(100, 70, 10, 20, 30, 40, 50, 60, 33, 80, 11, 25, 35, 55, 72, 82, 92);
+        insert(insertedKeys, tree);
         tree.printTree();
-        assert tree.getAllKeysInOrder().equals(List.of(10));
+        // 🔍 Validate value lookup
+        for (int key : insertedKeys) {
+            Integer val = tree.getValue(key);
+            if (val == null || !val.equals(100 + key)) {
+                throw new RuntimeException("❌ Wrong value for key " + key + ". Expected: V" + (key+100) + ", Got: " + val);
+            }
+        }
+        assert tree.getAllKeysInOrder().equals(List.of(17));
     }
 
     public void testRedistribution() {

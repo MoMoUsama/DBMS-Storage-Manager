@@ -33,14 +33,16 @@ public class BPlusTree<Key extends Comparable<Key>, RID> {
     public void setRootPageID(int rootID){
         this.rootPageId=rootID;
     }
-    private int allocatePageId() throws Exception {
+    private int allocatePageId() {
         Page p = bufferPool.newPage();
-        return p.getPageId();
+        if(p==null)
+            return -1;
+        else
+            return p.getPageId();
     }
     public boolean insert(Key key, RID value) {
         Stack<BPlusTreePage> parentStack = new Stack<>();
         LeafPage<Key, RID> leaf = findLeafPage(key, parentStack); //get the correct leaf
-
         // Duplicate-key check
         if (leaf.containsKey(key)) {
             return false;
@@ -56,6 +58,9 @@ public class BPlusTree<Key extends Comparable<Key>, RID> {
         // Leaf is full → split + insert + push key up
         try {
             int newleafID = allocatePageId();
+            if (newleafID==-1){
+                throw new RuntimeException("Cannot Find free frame, there is no evictable frames");
+            }
             LeafPage<Key, RID> newLeaf = leaf.splitLeafPage(newleafID);
 
             if (key.compareTo(newLeaf.keyAt(0)) < 0) {
@@ -74,8 +79,8 @@ public class BPlusTree<Key extends Comparable<Key>, RID> {
         catch (Exception e)
         {
             System.out.println(e);
+            return false;
         }
-        return false;
     }
 
 
@@ -488,6 +493,7 @@ public class BPlusTree<Key extends Comparable<Key>, RID> {
 
         // Go to the leftmost leaf
         BPlusTreePage page = readPage(pageId);
+        System.out.println("[getAllKeysInOrder] the rootPage ID IS: "+pageId);
         if(page==null)
         {
             System.out.println("Cannot Fetch the root Page to start traversal");
@@ -496,6 +502,7 @@ public class BPlusTree<Key extends Comparable<Key>, RID> {
         while (!page.isLeafPage()) {
             InternalPage<Key> internal = (InternalPage<Key>) readPage(pageId);
             pageId = internal.valueAt(0);
+            page = readPage(pageId);
         }
         System.out.println("The left Most ID is: "+pageId);
 

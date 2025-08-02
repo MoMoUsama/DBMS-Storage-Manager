@@ -16,7 +16,7 @@ public class BufferPoolManager {
         try {
             lruk = new LRUKReplacer(kForLRU);
             disk_sch = new DiskScheduler();
-            this.BoolSize = 10;
+            this.BoolSize = BoolSize;
             this.frames = new Page[this.BoolSize];
             this.UsedFrames = new HashMap<>();
             this.PageTable = new HashMap<>();
@@ -134,7 +134,7 @@ public class BufferPoolManager {
         int frameId = getFreeFrame();
         try {
             if (frameId == -1)
-                throw new RuntimeException("Error Cannot Find Free Frame");
+                throw new RuntimeException("[BufferPoolManager] Cannot Find Free Frame, there is no evictable frames");
             int pageId = nextPageId++;
             Page page = new Page(pageId);
             page.pin_count = 1;
@@ -163,8 +163,8 @@ public class BufferPoolManager {
         catch(Exception e)
         {
             System.out.println(e);
+            return null;
         }
-        return null;
     }
 
     private void flushPage (int pageID) throws Exception

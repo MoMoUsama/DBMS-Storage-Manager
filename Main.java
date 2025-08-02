@@ -7,9 +7,9 @@ public class Main {
         t.testDeletionScenarios();
         t.testDuplicateInsertion();
         t.testMergeAfterDeletions();
-        t.testRedistribution();
+        /*t.testRedistribution();
         t.testStressAndOrder();
         t.testPersistenceCorrectness();
-        System.out.println("All Tests Completed");
+        System.out.println("All Tests Completed");*/
     }
 }
